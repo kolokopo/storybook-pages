@@ -32,7 +32,6 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "init-msw": "msw init public/",
     "test-storybook": "test-storybook",
     "chromatic": "chromatic --exit-zero-on-changes"
   },
@@ -52,16 +51,11 @@
     "@vitejs/plugin-react": "^3.1.0",
     "chromatic": "^7.5.4",
     "gh-pages": "^6.0.0",
-    "msw": "^1.2.1",
-    "msw-storybook-addon": "^1.8.0",
     "prop-types": "^15.8.1",
     "storybook": "^7.0.6",
     "vite": "^4.2.0"
   },
   "packageManager": "yarn@4.0.0",
-  "msw": {
-    "workerDirectory": "public"
-  },
   "readme": "ERROR: No README data found!",
   "homepage": "https://01clarian.github.io/storybook-example",
   "_id": "intro-storybook-react-template@0.2.0"
