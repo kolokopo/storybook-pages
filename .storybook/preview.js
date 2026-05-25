@@ -11,21 +11,13 @@ const preview = {
   decorators: [
     mswDecorator,
 
-    // 👇 Branch switcher decorator
+    // ✅ SAFE branch switcher (NO full page redirect anymore)
     (Story, context) => {
       const branch = context.globals.branch;
 
       useEffect(() => {
-        const currentPath = window.location.pathname;
-
-        const target =
-          branch === "main"
-            ? "/storybook-pages/"
-            : "/storybook-pages/develop/";
-
-        if (!currentPath.startsWith(target)) {
-          window.location.href = target;
-        }
+        // Store branch globally (safe for GitHub Pages)
+        window.__STORYBOOK_BRANCH__ = branch;
       }, [branch]);
 
       return Story();
@@ -57,6 +49,9 @@ const preview = {
         date: /Date$/,
       },
     },
+
+    // ✅ IMPORTANT: ensures Story mode UI (toolbar enabled)
+    viewMode: "story",
   },
 };
 
