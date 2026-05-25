@@ -26,11 +26,11 @@ jobs:
           cache: yarn
 
       - run: yarn install
-      - run: yarn build
+      - run: yarn build-storybook
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: storybook-static
 
   deploy:
     needs: build
