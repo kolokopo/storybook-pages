@@ -10,6 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,8 +53,25 @@ jobs:
         working-directory: develop
         run: yarn build-storybook -o ../out/develop
 
-      # ================= DEPLOY =================
-      - name: Upload artifact
+      # ================= ROOT ROUTING SETUP =================
+      - name: Prepare final deploy structure
+        run: |
+          rm -rf out
+          mkdir -p out
+
+          # / (root) = main
+          cp -r main/storybook-static/* out/
+
+          # /main = main (explicit route)
+          mkdir -p out/main
+          cp -r main/storybook-static/* out/main
+
+          # /develop = develop
+          mkdir -p out/develop
+          cp -r develop/storybook-static/* out/develop
+
+      # ================= UPLOAD =================
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: out
