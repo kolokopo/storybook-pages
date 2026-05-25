@@ -30,38 +30,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: yarn
 
-      # =========================
-      # BUILD MAIN
-      # =========================
-      - name: Install deps (main)
+      # ================= MAIN =================
+      - name: Install main
         working-directory: main
         run: yarn install
 
-      - name: Build main Storybook
+      - name: Build main
         working-directory: main
         run: yarn build-storybook -o ../out/main
-        env:
-          STORYBOOK_BASE_PATH: /storybook-pages/main/
 
-      # =========================
-      # BUILD DEVELOP
-      # =========================
-      - name: Install deps (develop)
+      # ================= DEVELOP =================
+      - name: Install develop
         working-directory: develop
         run: yarn install
 
-      - name: Build develop Storybook
+      - name: Build develop
         working-directory: develop
         run: yarn build-storybook -o ../out/develop
-        env:
-          STORYBOOK_BASE_PATH: /storybook-pages/develop/
 
-      # =========================
-      # DEPLOY
-      # =========================
-      - name: Upload Pages artifact
+      # ================= DEPLOY =================
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: out
