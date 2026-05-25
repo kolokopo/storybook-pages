@@ -1,22 +1,13 @@
 import "../src/index.css";
-
-import { initialize, mswDecorator } from "msw-storybook-addon";
 import { useEffect } from "react";
-
-// Registers MSW addon
-initialize();
 
 /** @type { import('@storybook/react').Preview } */
 const preview = {
   decorators: [
-    mswDecorator,
-
-    // ✅ SAFE branch switcher (NO full page redirect anymore)
     (Story, context) => {
       const branch = context.globals.branch;
 
       useEffect(() => {
-        // Store branch globally (safe for GitHub Pages)
         window.__STORYBOOK_BRANCH__ = branch;
       }, [branch]);
 
@@ -41,17 +32,14 @@ const preview = {
   },
 
   parameters: {
+    viewMode: "story", // keeps toolbar working
     actions: { argTypesRegex: "^on[A-Z].*" },
-
     controls: {
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/,
       },
     },
-
-    // ✅ IMPORTANT: ensures Story mode UI (toolbar enabled)
-    viewMode: "story",
   },
 };
 
