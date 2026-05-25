@@ -1,8 +1,8 @@
-name: Deploy Pages
+name: Deploy Storybook
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
 
 permissions:
   contents: read
@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -26,19 +26,32 @@ jobs:
           cache: yarn
 
       - run: yarn install
-      - run: yarn build-storybook
+
+      - name: Build Storybook
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            yarn build-storybook -- -o storybook-static
+          else
+            yarn build-storybook -- -o storybook-static/develop
+          fi
+
+      - name: Prepare output
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            mkdir -p out
+            mv storybook-static/* out/
+          else
+            mkdir -p out/develop
+            mv storybook-static/develop/* out/develop/
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: storybook-static
+          path: out
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v4
