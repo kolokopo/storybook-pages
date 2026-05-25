@@ -1,6 +1,7 @@
-name: Deploy Storybook
+name: Deploy Storybook (multi-branch)
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, develop]
 
@@ -9,43 +10,59 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          path: develop
 
       - uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: yarn
 
-      - run: yarn install
+      # =========================
+      # BUILD MAIN
+      # =========================
+      - name: Install deps (main)
+        working-directory: main
+        run: yarn install
 
-      - name: Build Storybook
-        run: |
-          if [ "${GITHUB_REF_NAME}" = "main" ]; then
-            yarn build-storybook -- -o storybook-static
-          else
-            yarn build-storybook -- -o storybook-static/develop
-          fi
+      - name: Build main Storybook
+        working-directory: main
+        run: yarn build-storybook -o ../out/main
+        env:
+          STORYBOOK_BASE_PATH: /storybook-pages/main/
 
-      - name: Prepare output
-        run: |
-          if [ "${GITHUB_REF_NAME}" = "main" ]; then
-            mkdir -p out
-            mv storybook-static/* out/
-          else
-            mkdir -p out/develop
-            mv storybook-static/develop/* out/develop/
-          fi
+      # =========================
+      # BUILD DEVELOP
+      # =========================
+      - name: Install deps (develop)
+        working-directory: develop
+        run: yarn install
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Build develop Storybook
+        working-directory: develop
+        run: yarn build-storybook -o ../out/develop
+        env:
+          STORYBOOK_BASE_PATH: /storybook-pages/develop/
+
+      # =========================
+      # DEPLOY
+      # =========================
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: out
 
